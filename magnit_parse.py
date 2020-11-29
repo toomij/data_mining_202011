@@ -20,15 +20,26 @@ class MagnitParse:
         client = pymongo.MongoClient(os.getenv('DATA_BASE'))
         self.db = client['gb_parse_11']
 
+# {
+        #     "url": str,
+        #     "promo_name": str,
+        #     "product_name": str,
+        #     "old_price": float,
+        #     "new_price": float,
+        #     "image_url": str,
+        #     "date_from": "DATETIME",
+        #     "date_to": "DATETIME",
+        # }
         self.product_template = {
             'url': lambda soup: urljoin(self.start_url, soup.get('href')),
             'promo_name': lambda soup: soup.find('div', attrs={'class': 'card-sale__header'}).text,
             'product_name': lambda soup: soup.find('div', attrs={'class': 'card-sale__title'}).text,
+            'old_price': lambda soup: soup.find('div', attrs={'class': 'label__price_old'}).text,
+            'new_price': lambda soup: soup.find('div', attrs={'class': 'label__price_new'}).text,
             'image_url': lambda soup: urljoin(self.start_url, soup.find('img').get('data-src')),
-            'test_1': lambda _: 22,
-            'test2': lambda _: 2.222,
-            'test3': lambda _: dt.datetime.now()
+            'date_from': lambda soup: soup.find('div', attrs={'class': 'card-sale__date'}).text,
         }
+
 
     @staticmethod
     def _get(*args, **kwargs):
