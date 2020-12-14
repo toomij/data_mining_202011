@@ -1,7 +1,6 @@
 import re
 import scrapy
-import pymongo
-from decouple import config
+from ..loaders import AutoYoulaLoader
 
 class AutoyoulaSpider(scrapy.Spider):
     name = 'autoyoula'
@@ -17,9 +16,8 @@ class AutoyoulaSpider(scrapy.Spider):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        DB_STRING = config('DB')
 
-        self.db = pymongo.MongoClient()[DB_STRING][self.name]
+        self.db = pymongo.MongoClient()['DATA_BASE'][self.name]
 
 
     def parse(self, response):
@@ -43,7 +41,7 @@ class AutoyoulaSpider(scrapy.Spider):
             'specification': self.get_specifications(response),
         }
 
-        self.db.insert_one(data)
+        yield data
 
     def get_specifications(self, response):
         return {itm.css('.AdvertSpecs_label__2JHnS::text').get(): itm.css(
